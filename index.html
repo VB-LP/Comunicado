@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comunicados Builder</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f3f5f9;font-size:13px}
+
+.app{min-height:100vh;display:flex;flex-direction:column}
+.hdr{background:#0B1D3A;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px}
+.hdr-logo{font-size:11px;font-weight:800;background:#2A85CA;padding:4px 10px;border-radius:4px}
+.hdr-t{font-size:13px;font-weight:700}
+.hdr-s{font-size:10px;color:rgba(255,255,255,.45)}
+.hdr-r{margin-left:auto;display:flex;gap:8px}
+.main{display:flex;flex:1}
+.sidebar{width:260px;background:#fff;border-right:1px solid #dde3ec;padding:14px;overflow-y:auto;max-height:calc(100vh - 48px);display:flex;flex-direction:column;gap:10px}
+.sec-label{font-size:9px;font-weight:700;letter-spacing:.8px;color:#8896a7;text-transform:uppercase;margin-bottom:6px}
+.content{flex:1;display:flex;flex-direction:column}
+.topbar{background:#fff;border-bottom:1px solid #dde3ec;padding:8px 16px;font-size:9px;color:#5e6e82}
+.topbar b{color:#0B1D3A}
+.canvas{flex:1;overflow-y:auto;padding:24px;display:flex;justify-content:center}
+
+.btn{border:none;border-radius:4px;padding:6px 12px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .12s}
+.btn-primary{background:#2A85CA;color:#fff}.btn-primary:hover{background:#1E5F99}
+.btn-secondary{background:#dde3ec;color:#5e6e82}.btn-secondary:hover{background:#c8cfd9}
+.btn-sm{padding:3px 8px;font-size:9px}
+.btn-danger{background:#fee2e2;color:#dc2626;border:none;padding:3px 8px;border-radius:3px;font-size:9px;font-weight:700;cursor:pointer}
+.hdr-btn{background:#2A85CA;border:none;color:#fff;padding:6px 14px;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer}
+.hdr-btn:hover{background:#1E5F99}
+
+.bloco-btn{padding:7px 10px;border:1px solid #dde3ec;border-radius:5px;background:#fafbfd;font-size:10px;font-weight:600;color:#0B1D3A;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;transition:all .1s}
+.bloco-btn:hover{border-color:#2A85CA;background:#f0f7ff}
+.bloco-btn svg{flex-shrink:0;overflow:visible}
+
+.com-item{padding:8px;border:1px solid #dde3ec;border-radius:4px;background:#fafbfd;cursor:pointer;margin-bottom:4px}
+.com-item.active{border:2px solid #2A85CA;background:#E9F2FA}
+.com-item-t{font-size:9px;font-weight:600;color:#0B1D3A}
+.com-item-d{font-size:8px;color:#8896a7}
+hr.sep{border:none;border-top:1px solid #dde3ec;margin:2px 0}
+
+.a4{width:800px;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.1);border:1px solid #d4d9e0;display:flex;flex-direction:column;min-height:600px}
+.a4-head{background:#0B1D3A;padding:16px 24px;border-bottom:3px solid #2A85CA;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:opacity .15s}
+.a4-head:hover{opacity:.9}
+.a4-head:hover::after{content:"✎ Editar cabeçalho";position:absolute;top:4px;right:28px;font-size:8px;color:#2A85CA;background:rgba(11,29,58,.85);padding:2px 6px;border-radius:3px;pointer-events:none}
+.a4-head{position:relative}
+.a4-head-l{display:flex;flex-direction:column;gap:2px;align-items:flex-start;justify-content:center}
+.a4-head-title{font-size:18px;font-weight:700;color:#fff}
+.a4-head-dept{font-size:12px;font-weight:600;color:#7ebce6;margin-bottom:4px}
+.a4-head-date{font-size:9px;font-weight:600;color:#d4eaf7;text-align:right}
+.a4-head-ci{font-size:7px;color:rgba(255,255,255,.35);text-align:right;margin-top:2px}
+.a4-body{flex:1;padding:22px 24px;display:flex;flex-direction:column;gap:14px}
+.a4-foot{background:#fafbfd;border-top:1px solid #dde3ec;padding:8px 24px;font-size:9px;color:#5e6e82;display:flex;justify-content:space-between;align-items:center}
+
+.bloco-wrap{position:relative;border-radius:4px;cursor:pointer;transition:outline .1s}
+.bloco-wrap:hover{outline:2px dashed #2A85CA}
+.bloco-wrap:hover .bloco-del{opacity:1}
+.bloco-del{position:absolute;top:4px;right:4px;opacity:0;background:#fee2e2;color:#dc2626;border:none;padding:2px 6px;border-radius:3px;font-size:10px;font-weight:700;cursor:pointer;transition:opacity .1s}
+
+.b-text{font-size:12px;line-height:1.65;color:#5e6e82;text-align:justify;white-space:pre-wrap;word-break:break-word}
+.b-title{font-size:13px;font-weight:700;color:#2A85CA;border-bottom:2px solid #2A85CA;padding-bottom:4px;margin-bottom:6px}
+.b-intro{display:flex;flex-direction:column;gap:6px}
+.b-greeting{font-size:12px;color:#5e6e82}
+.b-hl{background:#E9F2FA;border-left:3px solid #2A85CA;padding:10px 12px;border-radius:3px}
+.b-hl-t{font-size:12px;font-weight:700;color:#2A85CA;margin-bottom:3px}
+.b-hl-txt{font-size:11px;line-height:1.55;color:#0B1D3A;text-align:justify;white-space:pre-wrap}
+.b-bullet-row{display:flex;gap:8px;margin-bottom:5px}
+.b-bullet-dot{color:#2A85CA;font-weight:800;flex-shrink:0;font-size:13px;line-height:1.4}
+.b-warn{background:#fffbea;border:1px solid #ffe7b2;border-radius:4px;padding:10px 12px;display:flex;gap:10px}
+.b-warn-icon{display:flex;align-items:flex-start;padding-top:1px}
+.b-warn-t{font-size:11px;font-weight:700;color:#d97706;margin-bottom:2px}
+.b-info{background:#f0f7ff;border:1px solid #bfe3ff;border-radius:4px;padding:10px 12px;display:flex;gap:10px}
+.b-info-icon{display:flex;align-items:flex-start;padding-top:1px}
+.b-info-t{font-size:11px;font-weight:700;color:#2A85CA;margin-bottom:2px}
+.b-cta{background:#2A85CA;padding:12px 14px;border-radius:4px;color:#fff}
+.b-cta-t{font-size:12px;font-weight:700;margin-bottom:3px}
+.b-tl{display:flex;flex-direction:column;gap:8px}
+.b-tl-table{width:100%;border-collapse:collapse}
+.b-tl-table th{background:#0B1D3A;color:#fff;padding:6px 8px;font-size:9px;font-weight:600;border:1px solid #1E3A5F}
+.b-tl-table td{padding:6px 8px;font-size:11px;border:1px solid #dde3ec;color:#5e6e82}
+.b-tl-table tr:nth-child(even) td{background:#fafbfd}
+.b-tl-table td.hl-cell{background:#E9F2FA;color:#0B1D3A;font-weight:600;border-color:#2A85CA}
+
+/* Fluxograma */
+.b-flow{display:flex;flex-direction:column;gap:8px}
+.b-flow-grid{display:grid;align-items:center;padding:6px 0;gap:0}
+.b-flow-cell{display:flex;align-items:center;justify-content:center}
+.b-flow-node{background:#E9F2FA;border:1.5px solid #2A85CA;border-radius:5px;padding:7px 6px;font-size:8.5px;font-weight:600;color:#0B1D3A;text-align:center;width:100%}
+.b-flow-arr{display:flex;align-items:center;justify-content:center;color:#2A85CA;font-size:14px;font-weight:700;padding:0 2px}
+
+/* Imagem e anotações */
+.b-img-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.b-img-box{overflow:hidden;border:1px solid #dde3ec;border-radius:4px;position:relative}
+.b-img-box img{display:block;width:100%;height:100%;object-fit:cover}
+.b-img-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f3f5f9;border:2px dashed #c5d2e0;border-radius:4px;gap:6px;color:#8896a7}
+.b-img-caption{font-size:8px;color:#8896a7;font-style:italic;text-align:center}
+.b-img-disclaimer{font-size:8px;color:#5e6e82;padding:6px;background:#fafbfd;border-left:2px solid #dde3ec;text-align:justify;white-space:pre-wrap;word-break:break-word;width:100%}
+
+/* Anotações sobre a imagem */
+.img-annotation{position:absolute;border:1.5px solid #2A85CA;background:rgba(42,133,202,0.10);pointer-events:none}
+.img-annotation-label{position:absolute;top:-20px;left:0;background:#2A85CA;color:#fff;font-size:11px;font-weight:600;padding:3px 8px;border-radius:3px;white-space:nowrap;display:flex;align-items:center;gap:4px;line-height:1.6}
+
+/* Canvas de seleção de retângulo sobre a imagem no editor */
+.img-rect-canvas{position:absolute;inset:0;cursor:crosshair;z-index:100;pointer-events:auto}
+
+.b-tut{display:flex;flex-direction:column;gap:10px}
+.b-tut-title{font-size:11px;font-weight:700;color:#0B1D3A}
+.b-tut-grid{display:grid;gap:10px}
+.step-card{background:#fafbfd;border:1px solid #dde3ec;border-radius:5px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.step-num{font-size:9px;font-weight:700;color:#2A85CA}
+.step-img{border-radius:3px;overflow:hidden;border:1px solid #dde3ec;background:#f3f5f9;display:flex;align-items:center;justify-content:center}
+.step-img img{width:100%;height:100%;object-fit:cover;display:block}
+.step-img-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#8896a7;width:100%;height:100%}
+.step-title{font-size:9px;font-weight:700;color:#0B1D3A}
+.step-desc{font-size:8.5px;line-height:1.45;color:#5e6e82;text-align:justify;white-space:pre-wrap;word-break:break-word}
+.b-sig{padding-top:8px}
+.b-sig-name{font-size:12px;font-weight:700;color:#0B1D3A}
+.b-sig-role{font-size:11px;color:#5e6e82}
+.b-sig-msg{font-size:11px;color:#5e6e82;margin-bottom:8px;line-height:1.5}
+
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:900}
+.overlay.show{display:flex}
+.modal{background:#fff;border-radius:6px;width:90%;max-width:600px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.modal-head{background:#0B1D3A;color:#fff;padding:12px 16px;border-bottom:2px solid #2A85CA;font-size:12px;font-weight:700;border-radius:6px 6px 0 0;display:flex;justify-content:space-between;align-items:center}
+.modal-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:18px;cursor:pointer;line-height:1}
+.modal-close:hover{color:#fff}
+.modal-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.modal-foot{padding:12px 16px;border-top:1px solid #dde3ec;display:flex;gap:8px;justify-content:flex-end}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fl{font-size:9px;font-weight:600;color:#0B1D3A;display:flex;align-items:center;gap:5px}
+.fi,.fta,.fsel{border:1px solid #dde3ec;border-radius:4px;padding:6px 8px;font-size:10px;font-family:inherit;color:#0B1D3A;background:#fafbfd;width:100%}
+.fi:focus,.fta:focus,.fsel:focus{outline:none;border-color:#2A85CA;box-shadow:0 0 0 2px rgba(42,133,202,.12)}
+.fta{resize:vertical;min-height:80px}
+.fsel{cursor:pointer}
+.sl-row{display:flex;align-items:center;gap:8px}
+.sl-row input[type=range]{flex:1}
+.sl-val{font-size:9px;color:#8896a7;min-width:38px}
+.upload-drop{border:2px dashed #2A85CA;border-radius:6px;background:#f0f7ff;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px}
+.upload-drop:hover,.upload-drop.over{background:#E9F2FA;border-color:#1E5F99}
+.upload-hidden{display:none}
+.preview-thumb{max-width:100%;max-height:180px;border-radius:4px;border:1px solid #dde3ec;margin-top:6px;display:block}
+.hint{font-size:8px;color:#8896a7;margin-top:2px}
+
+/* Tooltip */
+.tip-btn{background:none;border:1.5px solid #8896a7;border-radius:50%;width:18px;height:18px;font-size:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+.tip-btn::after{content:"?";font-size:10px;font-weight:700;color:#8896a7;font-family:Inter,sans-serif}
+.tip-btn:hover{border-color:#2A85CA;background:#E9F2FA}
+.tip-btn:hover::after{color:#2A85CA}
+.tip-panel{display:none;background:#E9F2FA;border:1px solid #bfe3ff;border-radius:4px;padding:8px 10px;font-size:9px;line-height:1.5;color:#0B1D3A;margin-top:4px}
+.tip-panel.show{display:block}
+
+/* Image editor */
+.ie-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:none;flex-direction:column}
+.ie-overlay.show{display:flex}
+.ie-toolbar{background:#0B1D3A;padding:10px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:2px solid #2A85CA}
+.ie-toolbar span{font-size:10px;color:#fff;font-weight:600;margin-right:4px}
+.ie-tool-btn{background:#1E3A5F;border:1px solid #2A85CA;color:#fff;padding:5px 10px;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px}
+.ie-tool-btn:hover,.ie-tool-btn.active{background:#2A85CA}
+.ie-color{width:32px;height:32px;border:2px solid #2A85CA;border-radius:4px;cursor:pointer;padding:2px}
+.ie-size{width:60px;padding:4px 6px;border:1px solid #2A85CA;border-radius:4px;font-size:10px;background:#1E3A5F;color:#fff;font-family:inherit}
+.ie-sep{width:1px;height:24px;background:rgba(255,255,255,.15);margin:0 4px}
+.ie-canvas-area{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:20px;background:repeating-conic-gradient(#e0e0e0 0% 25%, #fff 0% 50%) 50%/20px 20px;position:relative}
+.ie-canvas-area canvas{cursor:crosshair;box-shadow:0 2px 12px rgba(0,0,0,.3);max-width:calc(100vw - 60px);max-height:calc(100vh - 160px);object-fit:contain}
+.ie-foot{background:#0B1D3A;padding:10px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #1E3A5F}
+/* Modo anotação de retângulo — overlay invisível sobre a imagem no a4 */
+.ie-rect-mode canvas{cursor:crosshair}
+
+/* Modal de anotação (ícone + título) */
+.annot-modal{background:#fff;border-radius:6px;width:400px;box-shadow:0 12px 40px rgba(0,0,0,.25);display:flex;flex-direction:column}
+.annot-modal-head{background:#0B1D3A;color:#fff;padding:10px 14px;border-bottom:2px solid #2A85CA;font-size:11px;font-weight:700;border-radius:6px 6px 0 0;display:flex;justify-content:space-between;align-items:center}
+.icon-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:4px}
+.icon-opt{border:1.5px solid #dde3ec;border-radius:5px;padding:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;background:#fafbfd;transition:all .1s}
+.icon-opt:hover{border-color:#2A85CA;background:#f0f7ff}
+.icon-opt.selected{border-color:#2A85CA;background:#E9F2FA}
+.icon-opt-label{font-size:8px;color:#5e6e82;text-align:center;line-height:1.2}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hdr">
+  <div class="hdr-logo">MUNDIVOX</div>
+  <div class="hdr-t">Comunicados Builder</div>
+  <div class="hdr-s">Construtor de comunicados internos</div>
+  <div class="hdr-r"><button class="hdr-btn" onclick="exportarHTML()">HTML</button><button class="hdr-btn" onclick="exportarImagemJPG()">Imagem</button></div>
+</div>
+<div class="main">
+  <div class="sidebar">
+    <div><div class="sec-label">Comunicados</div><div id="comList"></div></div>
+    <hr class="sep">
+    <div><div class="sec-label">Adicionar bloco</div><div id="tiposBlocos" style="display:flex;flex-direction:column;gap:4px"></div></div>
+  </div>
+  <div class="content">
+    <div class="topbar"><b>Assunto:</b> <span id="topAssunto"></span></div>
+    <div class="canvas">
+      <div class="a4">
+        <div class="a4-head" onclick="abrirModalCabecalho()" title="Clique para editar o cabeçalho">
+          <div class="a4-head-l">
+            <div class="a4-head-dept" id="headDept"></div>
+            <div class="a4-head-title" id="headTitle"></div>
+          </div>
+        </div>
+        <div class="a4-body" id="blocosList"></div>
+        <div class="a4-foot"><span>Comunicado Interno</span><span id="footDate"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Modal principal de blocos -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <div class="modal-head"><span id="modalTitle"></span><button class="modal-close" onclick="fecharModal()">×</button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot"><button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" onclick="salvarBloco()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal cabeçalho -->
+<div class="overlay" id="modalCab">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-head"><span>Editar Cabeçalho</span><button class="modal-close" onclick="fecharModalCab()">×</button></div>
+    <div class="modal-body">
+      <div class="fg"><div class="fl">Título</div><input class="fi" id="cab-titulo" placeholder="Ex: Autoprovisionamento - Módulo Técnicos"></div>
+      <div class="fg"><div class="fl">Subtítulo / Departamento</div><input class="fi" id="cab-sub" placeholder="Ex: Operações"></div>
+      <div class="fg"><div class="fl">Data</div><input class="fi" id="cab-data" type="date"></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-secondary" onclick="fecharModalCab()">Cancelar</button><button class="btn btn-primary" onclick="salvarCabecalho()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal anotação (retângulo clicado) -->
+<div class="overlay" id="modalAnnot" style="z-index:3000">
+  <div class="annot-modal">
+    <div class="annot-modal-head"><span>Configurar Anotação</span><button class="modal-close" onclick="fecharModalAnnot()">×</button></div>
+    <div class="modal-body" style="gap:10px">
+      <div class="fg"><div class="fl">Título da anotação</div><input class="fi" id="annot-titulo" placeholder="Ex: Ponto de atenção"></div>
+      <div class="fg"><div class="fl">Ícone</div>
+        <div class="icon-grid" id="iconGrid"></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-secondary" onclick="fecharModalAnnot()">Cancelar</button><button class="btn btn-primary" onclick="confirmarAnnot()">Confirmar</button></div>
+  </div>
+</div>
+
+<!-- Image editor (crop, rect, arrow) -->
+<div class="ie-overlay" id="imgEditor">
+  <div class="ie-toolbar">
+    <span>Editor de Imagem</span><div class="ie-sep"></div>
+    <button class="ie-tool-btn" id="ie-crop" onclick="setTool('crop')">✂ Cortar</button>
+    <button class="ie-tool-btn" id="ie-rect" onclick="setTool('rect')">▭ Retângulo</button>
+    <button class="ie-tool-btn" id="ie-arrow" onclick="setTool('arrow')">↗ Seta</button>
+    <div class="ie-sep"></div>
+    <input type="color" class="ie-color" id="ieColor" value="#2A85CA">
+    <input type="number" class="ie-size" id="ieSize" value="2" min="1" max="20" title="Espessura">
+    <div class="ie-sep"></div>
+    <button class="ie-tool-btn" onclick="ieUndo()">↩ Desfazer</button>
+  </div>
+  <div class="ie-canvas-area"><canvas id="ieCanvas"></canvas></div>
+  <div class="ie-foot"><button class="btn btn-secondary" onclick="fecharEditor()">Cancelar</button><button class="btn btn-primary" onclick="confirmarEditor()">Aplicar</button></div>
+</div>
+
+<script>
+/* ── ESTADO ── */
+let comunicados = [{
+  id:1, subject:"Autoprovisionamento - Almoxarifado e Técnicos", date:"2025-01-15", department:"Operações",
+  blocks:[
+    {type:"intro",data:{greeting:"Prezados(as),",text:"Comunicamos as datas de Treinamento, Teste e Implantação para o projeto autoprovisionamento nos módulos de Almoxarifado e Técnicos.\nSeguem os cronogramas por etapa:"}},
+    {type:"aviso",data:{title:"Atenção",text:"Compareça ao treinamento na data programada para sua filial e realize a leitura do documento anexo.\nA participação é obrigatória para a correta utilização do sistema após a implantação."}}
+  ]
+}];
+let selId=1, editIdx=null, editorCallback=null;
+
+/* Estado do retângulo sendo desenhado na imagem */
+let annotDraw={active:false,blocoIdx:null,startX:0,startY:0,pendingRect:null,pendingAnnotIdx:null};
+
+/* ── ÍCONES DISPONÍVEIS PARA ANOTAÇÃO ── */
+const ANNOT_ICONS=[
+  {id:'attention', label:'Atenção',    svg:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r=".6" fill="#d97706"/>',color:'#d97706'},
+  {id:'info',      label:'Info',       svg:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r=".6" fill="#2A85CA"/>',color:'#2A85CA'},
+  {id:'check',     label:'Correto',    svg:'<polyline points="20 6 9 17 4 12"/>',color:'#16a34a'},
+  {id:'x',         label:'Errado',     svg:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',color:'#dc2626'},
+  {id:'star',      label:'Destaque',   svg:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',color:'#2A85CA'},
+  {id:'arrow',     label:'Seta',       svg:'<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',color:'#2A85CA'},
+  {id:'edit',      label:'Editar',     svg:'<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',color:'#2A85CA'},
+  {id:'pin',       label:'Referência', svg:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',color:'#2A85CA'},
+  {id:'number1',   label:'① Passo 1', svg:'<circle cx="12" cy="12" r="10"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#2A85CA" stroke="none">1</text>',color:'#2A85CA'},
+  {id:'number2',   label:'② Passo 2', svg:'<circle cx="12" cy="12" r="10"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#2A85CA" stroke="none">2</text>',color:'#2A85CA'},
+];
+let selectedIcon='attention';
+let annotEditorState={drawing:false, sx:0, sy:0, annotations:[], img:null, requestId:null};
+
+/* ── SVG helpers ── */
+function svgI(paths,c,s){return `<svg width="${s||16}" height="${s||16}" fill="none" stroke="${c||'#2A85CA'}" stroke-width="1.8" viewBox="0 0 24 24" style="overflow:visible;flex-shrink:0">${paths}</svg>`}
+const ICO={
+  intro:    svgI('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>','#2A85CA',14),
+  section:  svgI('<path d="M4 6h16M4 12h16M4 18h12"/>','#2A85CA',14),
+  destaque: svgI('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/>','#2A85CA',14),
+  aviso:    svgI('<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r=".6" fill="#d97706"/>','#d97706',14),
+  info:     svgI('<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r=".6" fill="#2A85CA"/>','#2A85CA',14),
+  lista:    svgI('<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.5" fill="#2A85CA"/><circle cx="3" cy="12" r="1.5" fill="#2A85CA"/><circle cx="3" cy="18" r="1.5" fill="#2A85CA"/>','#2A85CA',14),
+  cronograma:svgI('<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>','#2A85CA',14),
+  fluxograma:svgI('<rect x="1" y="8" width="6" height="6" rx="1"/><rect x="9" y="8" width="6" height="6" rx="1"/><rect x="17" y="8" width="6" height="6" rx="1"/><line x1="7" y1="11" x2="9" y2="11"/><line x1="15" y1="11" x2="17" y2="11"/>','#2A85CA',14),
+  imagem:   svgI('<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>','#2A85CA',14),
+  tutorial: svgI('<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>','#2A85CA',14),
+  cta:      svgI('<polyline points="5 12 19 12"/><polyline points="12 5 19 12 12 19"/>','#2A85CA',14),
+  assinatura:svgI('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>','#2A85CA',14),
+};
+
+const TIPOS=[
+  {id:"intro",nome:"Introdução / Saudação",tip:"Texto de abertura do comunicado. Use para saudar e apresentar o contexto."},
+  {id:"section",nome:"Seção de Texto",tip:"Bloco com título e texto corrido. Ideal para detalhar informações."},
+  {id:"destaque",nome:"Caixa de Destaque",tip:"Caixa azul para mensagens que merecem destaque visual."},
+  {id:"aviso",nome:"Aviso / Atenção",tip:"Alerta amarelo para informações críticas ou obrigatórias."},
+  {id:"info",nome:"Informação",tip:"Nota informativa em azul claro. Para esclarecimentos adicionais."},
+  {id:"lista",nome:"Lista de Itens",tip:"Lista com marcador azul. Cada linha vira um item."},
+  {id:"cronograma",nome:"Cronograma / Tabela",tip:"Tabela customizável. Adicione colunas/linhas e destaque células. Alinhamento por célula."},
+  {id:"fluxograma",nome:"Fluxograma",tip:"Fluxo horizontal de etapas com setas. Cada item é uma caixa conectada por setas."},
+  {id:"imagem",nome:"Imagem",tip:"Imagem com legenda e disclaimer. Clique sobre a imagem para adicionar anotações com retângulo."},
+  {id:"tutorial",nome:"Passo a Passo",tip:"Tutorial visual com passos numerados lado a lado. Cada passo tem imagem, título e descrição."},
+  {id:"cta",nome:"Chamada para Ação",tip:"Banner azul para direcionar uma ação (acessar link, cadastro, etc)."},
+  {id:"assinatura",nome:"Assinatura",tip:"Nome e cargo do responsável pelo comunicado."},
+];
+const TIPS=Object.fromEntries(TIPOS.map(t=>[t.id,t.tip]));
+
+const TPL={
+  intro:{greeting:"Prezados(as),",text:"Texto de abertura..."},
+  section:{title:"Título da Seção",content:"Conteúdo da seção..."},
+  destaque:{title:"Destaque",text:"Texto do destaque..."},
+  aviso:{title:"Atenção",text:"Descrição do aviso..."},
+  info:{title:"Informação",text:"Texto informativo..."},
+  lista:{items:["Item 1","Item 2","Item 3"]},
+  cronograma:{title:"Cronograma",cols:["Etapa","Data","Descrição"],rows:[["Treinamento","22/06","Participação obrigatória"],["Implantação","29/06","Atualização do sistema"]],highlighted:{},align:{}},
+  fluxograma:{title:"Fluxo do Processo",nodes:["Início","Etapa 1","Etapa 2","Fim"]},
+  imagem:{url:"",caption:"",disclaimer:"",width:100,height:280},
+  tutorial:{title:"Passo a Passo",columns:3,steps:[{title:"Etapa 1",image:"",desc:"Descrição.",imgHeight:160},{title:"Etapa 2",image:"",desc:"Descrição.",imgHeight:160},{title:"Etapa 3",image:"",desc:"Descrição.",imgHeight:160}]},
+  cta:{title:"Acesse agora",text:"Clique aqui para..."},
+  assinatura:{name:"Nome Completo",role:"Cargo / Equipe",msg:"Em caso de dúvidas sobre este comunicado, entre em contato com o setor responsável pelo envio."},
+};
+
+/* ── RENDER ── */
+function render(){
+  document.getElementById('comList').innerHTML=comunicados.map(c=>`<div class="com-item ${c.id===selId?'active':''}" onclick="selId=${c.id};render()"><div class="com-item-t">${c.subject}</div><div class="com-item-d">${c.date}</div></div>`).join('');
+  document.getElementById('tiposBlocos').innerHTML=TIPOS.map(t=>`<button class="bloco-btn" onclick="addBloco('${t.id}')">${ICO[t.id]} ${t.nome}</button>`).join('');
+  renderPreview();
+}
+
+function renderPreview(){
+  const com=comunicados.find(c=>c.id===selId);
+  document.getElementById('topAssunto').textContent=com.subject;
+  document.getElementById('headTitle').textContent=com.subject;
+  document.getElementById('headDept').textContent=com.department;
+  document.getElementById('footDate').textContent=com.date;
+  document.getElementById('blocosList').innerHTML=com.blocks.map((b,i)=>`<div class="bloco-wrap" onclick="editBloco(${i})">${renderBloco(b,i)}<button class="bloco-del" onclick="delBloco(${i});event.stopPropagation()">✕</button></div>`).join('')||'<div style="color:#8896a7;font-size:10px;text-align:center;padding:50px 0">Use a barra lateral para adicionar blocos</div>';
+}
+
+function renderBloco(b,blocoIdx){
+  const d=b.data;
+  switch(b.type){
+    case 'intro':return `<div class="b-intro"><div class="b-greeting">${d.greeting}</div><div class="b-text">${d.text}</div></div>`;
+    case 'section':return `<div><div class="b-title">${d.title}</div><div class="b-text">${d.content}</div></div>`;
+    case 'destaque':return `<div class="b-hl"><div class="b-hl-t">${d.title}</div><div class="b-hl-txt">${d.text}</div></div>`;
+    case 'aviso':return `<div class="b-warn"><div class="b-warn-icon">${svgI('<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="17" r=".6" fill="#d97706"/>','#d97706',18)}</div><div><div class="b-warn-t">${d.title}</div><div class="b-text">${d.text}</div></div></div>`;
+    case 'info':return `<div class="b-info"><div class="b-info-icon">${svgI('<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r=".6" fill="#2A85CA"/>','#2A85CA',18)}</div><div><div class="b-info-t">${d.title}</div><div class="b-text">${d.text}</div></div></div>`;
+    case 'lista':return `<div>${d.items.map(it=>`<div class="b-bullet-row"><div class="b-bullet-dot">•</div><div class="b-text">${it}</div></div>`).join('')}</div>`;
+    case 'cronograma':{
+      const al=(ri,ci)=>(d.align&&d.align[ri+'_'+ci])||'left';
+      return `<div class="b-tl"><div class="b-title">${d.title}</div><table class="b-tl-table"><thead><tr>${d.cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${d.rows.map((row,ri)=>`<tr>${row.map((cell,ci)=>`<td class="${d.highlighted[ri]&&d.highlighted[ri][ci]?'hl-cell':''}" style="text-align:${al(ri,ci)}">${cell}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    }
+    case 'fluxograma':{
+      const n=d.nodes.length;
+      const cols=d.nodes.map((_,i)=>i<n-1?'1fr 24px':'1fr').join(' ');
+      return `<div class="b-flow"><div class="b-title">${d.title}</div><div class="b-flow-grid" style="grid-template-columns:${cols}">${d.nodes.map((nd,i)=>{let h='';if(i>0)h+=`<div class="b-flow-arr">→</div>`;h+=`<div class="b-flow-cell"><div class="b-flow-node">${nd}</div></div>`;return h;}).join('')}</div></div>`;
+    }
+    case 'imagem':return renderBlocoImagem(d,blocoIdx);
+    case 'tutorial':{
+      const cols=d.columns||3;
+      return `<div class="b-tut"><div class="b-tut-title">${d.title}</div><div class="b-tut-grid" style="grid-template-columns:repeat(${cols},1fr)">${d.steps.map((s,i)=>`<div class="step-card"><div class="step-num">Passo ${i+1}</div><div class="step-img" style="height:${s.imgHeight}px">${s.image?`<img src="${s.image}">`:`<div class="step-img-empty" style="height:${s.imgHeight}px">${svgI('<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>','#2A85CA',Math.min(s.imgHeight*.45,60))}<span style="font-size:8px">Imagem</span></div>`}</div><div class="step-title">${s.title}</div><div class="step-desc">${s.desc}</div></div>`).join('')}</div></div>`;
+    }
+    case 'cta':return `<div class="b-cta"><div class="b-cta-t">${d.title}</div><div class="b-text" style="color:rgba(255,255,255,.85)">${d.text}</div></div>`;
+    case 'assinatura':return `<div class="b-sig">${d.msg?`<div class="b-sig-msg">${d.msg}</div>`:''}<div style="${d.msg?'border-top:1px solid #dde3ec;padding-top:8px':''}"><div class="b-sig-name">${d.name}</div><div class="b-sig-role">${d.role}</div></div></div>`;
+    default:return '';
+  }
+}
+
+function renderBlocoImagem(d,bi){
+  if(!d.url){
+    return `<div class="b-img-wrap"><div class="b-img-empty" style="height:${d.height}px;width:${d.width}%">${svgI('<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>','#2A85CA',Math.min(d.height*.5,100))}<span style="font-size:10px">Clique para adicionar</span></div></div>`;
+  }
+  const ico=a=>{const c={attention:'⚠',info:'ⓘ',check:'✓',x:'✕',star:'★',arrow:'→',edit:'✎',pin:'⊙',number1:'①',number2:'②'};return c[a.icon]||''};
+  const annots=(d.annotations||[]).map(a=>`
+    <div class="img-annotation" style="left:${a.x}%;top:${a.y}%;width:${a.w}%;height:${a.h}%">
+      <div class="img-annotation-label">${ico(a)} ${a.title||''}</div>
+    </div>`).join('');
+  return `<div class="b-img-wrap">
+    <div class="b-img-box" style="width:${d.width}%;height:${d.height}px;position:relative">
+      <img src="${d.url}">
+      ${annots}
+    </div>
+    ${d.caption?`<div class="b-img-caption">${d.caption}</div>`:''}
+    ${d.disclaimer?`<div class="b-img-disclaimer" style="width:${d.width}%">${d.disclaimer}</div>`:''}
+  </div>`;
+}
+
+/* Ícone em texto simples por id — usado no canvas (SVG não funciona em canvas) */
+const ANNOT_ICON_CHAR={
+  attention:'⚠', info:'ⓘ', check:'✓', x:'✕', star:'★',
+  arrow:'→', edit:'✎', pin:'⊙', number1:'①', number2:'②'
+};
+
+function drawAnnotOnCanvas(ctx, canvas, a){
+  const px=canvas.width*a.x/100;
+  const py=canvas.height*a.y/100;
+  const pw=canvas.width*a.w/100;
+  const ph=canvas.height*a.h/100;
+
+  /* Retângulo com borda azul e fundo semi-transparente */
+  ctx.strokeStyle='#2A85CA';
+  ctx.lineWidth=Math.max(canvas.width*0.0015,1.5);
+  ctx.setLineDash([]);
+  ctx.strokeRect(px,py,pw,ph);
+  ctx.fillStyle='rgba(42,133,202,0.10)';
+  ctx.fillRect(px,py,pw,ph);
+
+  /* Label pequeno e delicado no canto superior esquerdo, sobre a linha */
+  if(a.title||a.icon){
+    const scale=canvas.width/800; /* Escala proporcional */
+    const fs=Math.max(12*scale,11);
+    const pad=4*scale;
+    const lh=fs+6*scale;
+    const ico=ANNOT_ICON_CHAR[a.icon]||'';
+    const txt=(ico?(ico+' '):'')+( a.title||'');
+
+    ctx.font=`600 ${fs}px Inter,sans-serif`;
+    const tw=ctx.measureText(txt).width;
+    const lw=tw+pad*2;
+
+    /* Badge azul pequeno — acima da linha superior */
+    const bx=px;
+    const by=py-lh; /* fica acima do rect */
+    const br=4*scale;
+
+    ctx.fillStyle='#2A85CA';
+    ctx.beginPath();
+    ctx.roundRect(bx, by, lw, lh, br);
+    ctx.fill();
+
+    /* Texto branco dentro do badge */
+    ctx.fillStyle='#fff';
+    ctx.textBaseline='middle';
+    ctx.fillText(txt, bx+pad, by+lh/2);
+  }
+}
+
+function annotIconSvg(iconId,sz){
+  const ic=ANNOT_ICONS.find(x=>x.id===iconId)||ANNOT_ICONS[0];
+  return `<svg width="${sz}" height="${sz}" fill="none" stroke="${ic.color}" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0">${ic.svg}</svg>`;
+}
+
+/* ── MODAL ANOTAÇÃO ── */
+let annotPending={bi:null,rect:null,editIdx:null,annotations:null};
+
+function fecharModalAnnot(){
+  document.getElementById('modalAnnot').classList.remove('show');
+  annotPending={bi:null,rect:null,editIdx:null,annotations:null};
+}
+
+function renderIconGrid(){
+  document.getElementById('iconGrid').innerHTML=ANNOT_ICONS.map(ic=>`
+    <div class="icon-opt ${selectedIcon===ic.id?'selected':''}" onclick="selectIcon('${ic.id}')">
+      <svg width="22" height="22" fill="none" stroke="${ic.color}" stroke-width="2" viewBox="0 0 24 24">${ic.svg}</svg>
+      <div class="icon-opt-label">${ic.label}</div>
+    </div>`).join('');
+}
+
+function selectIcon(id){selectedIcon=id;renderIconGrid()}
+
+/* ── MODAL CABEÇALHO ── */
+function abrirModalCabecalho(){
+  const com=comunicados.find(c=>c.id===selId);
+  document.getElementById('cab-titulo').value=com.subject||'';
+  document.getElementById('cab-sub').value=com.department||'';
+  document.getElementById('cab-data').value=com.date||'';
+  document.getElementById('modalCab').classList.add('show');
+}
+function fecharModalCab(){document.getElementById('modalCab').classList.remove('show')}
+function salvarCabecalho(){
+  const com=comunicados.find(c=>c.id===selId);
+  com.subject=document.getElementById('cab-titulo').value;
+  com.department=document.getElementById('cab-sub').value;
+  com.date=document.getElementById('cab-data').value;
+  fecharModalCab();
+  render();
+}
+
+/* ── CRUD ── */
+function addBloco(t){const com=comunicados.find(c=>c.id===selId);com.blocks.push({type:t,data:JSON.parse(JSON.stringify(TPL[t]))});renderPreview()}
+function delBloco(i){comunicados.find(c=>c.id===selId).blocks.splice(i,1);renderPreview()}
+
+/* ── MODAL BLOCOS ── */
+function editBloco(i){
+  editIdx=i;
+  const b=comunicados.find(c=>c.id===selId).blocks[i];
+  const tipo=TIPOS.find(t=>t.id===b.type);
+  document.getElementById('modalTitle').textContent=`Editar: ${tipo?tipo.nome:b.type}`;
+  document.getElementById('modalBody').innerHTML=buildForm(b);
+  document.getElementById('modal').classList.add('show');
+  bindForm(b);
+}
+function fecharModal(){document.getElementById('modal').classList.remove('show');editIdx=null}
+
+function tipBtn(tipId){
+  const id='tip-'+Math.random().toString(36).slice(2,8);
+  return `<button class="tip-btn" onclick="var p=document.getElementById('${id}');p.classList.toggle('show')" title="Ajuda"></button><div class="tip-panel" id="${id}">${TIPS[tipId]||''}</div>`;
+}
+function lbl(t,tipId){return `<div class="fl">${t} ${tipId?tipBtn(tipId):''}</div>`}
+
+function buildForm(b){
+  const d=b.data, e=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  switch(b.type){
+    case 'intro':return `<div class="fg">${lbl('Saudação','intro')}<input class="fi" id="f-greeting" value="${e(d.greeting)}"></div><div class="fg">${lbl('Texto (Enter = nova linha)')}<textarea class="fta" id="f-text">${e(d.text)}</textarea></div>`;
+    case 'section':return `<div class="fg">${lbl('Título','section')}<input class="fi" id="f-title" value="${e(d.title)}"></div><div class="fg">${lbl('Conteúdo')}<textarea class="fta" id="f-content">${e(d.content)}</textarea></div>`;
+    case 'destaque':return `<div class="fg">${lbl('Título','destaque')}<input class="fi" id="f-title" value="${e(d.title)}"></div><div class="fg">${lbl('Texto')}<textarea class="fta" id="f-text">${e(d.text)}</textarea></div>`;
+    case 'aviso':return `<div class="fg">${lbl('Título','aviso')}<input class="fi" id="f-title" value="${e(d.title)}"></div><div class="fg">${lbl('Texto')}<textarea class="fta" id="f-text">${e(d.text)}</textarea></div>`;
+    case 'info':return `<div class="fg">${lbl('Título','info')}<input class="fi" id="f-title" value="${e(d.title)}"></div><div class="fg">${lbl('Texto')}<textarea class="fta" id="f-text">${e(d.text)}</textarea></div>`;
+    case 'cta':return `<div class="fg">${lbl('Título','cta')}<input class="fi" id="f-title" value="${e(d.title)}"></div><div class="fg">${lbl('Descrição')}<textarea class="fta" id="f-text">${e(d.text)}</textarea></div>`;
+    case 'assinatura':return `<div class="fg">${lbl('Mensagem padrão')}<textarea class="fta" id="f-msg" style="min-height:60px">${e(d.msg)}</textarea><div class="hint">Aparece antes do nome e cargo</div></div><div class="fg">${lbl('Nome')}<input class="fi" id="f-name" value="${e(d.name)}"></div><div class="fg">${lbl('Cargo')}<input class="fi" id="f-role" value="${e(d.role)}"></div>`;
+    case 'lista':return `<div class="fg">${lbl('Items (um por linha)','lista')}<textarea class="fta" id="f-items" style="min-height:120px">${d.items.join('\n')}</textarea></div>`;
+    case 'cronograma':return buildFormCron(d,e);
+    case 'fluxograma':return `<div class="fg">${lbl('Título','fluxograma')}<input class="fi" id="f-title" value="${e(d.title)}"></div><div class="fg">${lbl('Etapas (uma por linha)')}<textarea class="fta" id="f-nodes" style="min-height:120px">${d.nodes.join('\n')}</textarea></div>`;
+    case 'imagem':return buildFormImg(d,e);
+    case 'tutorial':return buildFormTut(d,e);
+  }
+}
+
+function buildFormCron(d,e){
+  if(!d.align) d.align={};
+  const colsH=d.cols.map((c,i)=>`<input class="fi" style="flex:1;min-width:70px" value="${e(c)}" onchange="getCur().cols[${i}]=this.value">`).join('');
+  const rowsH=d.rows.map((row,ri)=>`<div style="display:flex;gap:4px;align-items:center">${row.map((cell,ci)=>`<div style="flex:1;display:flex;gap:3px"><input class="fi" style="flex:1" value="${e(cell)}" onchange="getCur().rows[${ri}][${ci}]=this.value"><button class="btn btn-sm ${d.highlighted[ri]&&d.highlighted[ri][ci]?'btn-primary':'btn-secondary'}" onclick="toggleHl(${ri},${ci})" title="Destacar">★</button><select class="fsel" style="width:auto;padding:2px 4px;font-size:8px" onchange="getCur().align['${ri}_${ci}']=this.value;editBloco(editIdx)"><option value="left" ${(d.align[ri+'_'+ci]||'left')==='left'?'selected':''}>⬅</option><option value="center" ${d.align[ri+'_'+ci]==='center'?'selected':''}>⬌</option><option value="right" ${d.align[ri+'_'+ci]==='right'?'selected':''}>➡</option></select></div>`).join('')}<button class="btn-danger" onclick="getCur().rows.splice(${ri},1);editBloco(editIdx)">✕</button></div>`).join('');
+  return `<div class="fg">${lbl('Título','cronograma')}<input class="fi" id="f-title" value="${e(d.title)}"></div>
+    <div class="fg">${lbl('Colunas')}<div style="display:flex;gap:4px;flex-wrap:wrap">${colsH}<button class="btn btn-sm btn-secondary" onclick="getCur().cols.push('Nova');getCur().rows.forEach(r=>r.push(''));editBloco(editIdx)">+ Col</button></div></div>
+    <div class="fg">${lbl('Linhas (★ destaque, ⬅⬌➡ alinhamento)')}<div style="display:flex;flex-direction:column;gap:5px">${rowsH}</div><button class="btn btn-sm btn-secondary" style="margin-top:6px" onclick="getCur().rows.push(Array(getCur().cols.length).fill(''));editBloco(editIdx)">+ Linha</button></div>`;
+}
+
+function buildFormImg(d,e){
+  return `<div class="fg">${lbl('Imagem (arraste, clique ou Cole Ctrl+V)','imagem')}
+    <div class="upload-drop" id="imgDrop">${svgI('<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>','#2A85CA',48)}<div style="font-size:9px;color:#5e6e82">Arraste, clique ou cole Ctrl+V</div><input type="file" class="upload-hidden" id="imgFile" accept="image/*"></div>
+    ${d.url?`<img class="preview-thumb" src="${d.url}"><div style="margin-top:6px;display:flex;gap:6px"><button class="btn btn-sm btn-secondary" onclick="abrirEditor()">✏️ Editar (crop/seta/rect)</button><button class="btn btn-sm btn-secondary" onclick="abrirEditorComAnotacoes()">📌 Anotações</button></div>`:''}
+    </div>
+    <div class="fg">${lbl('Legenda')}<input class="fi" id="f-caption" value="${e(d.caption)}"></div>
+    <div class="fg">${lbl('Disclaimer (opcional)')}<textarea class="fta" id="f-disclaimer" style="min-height:50px">${e(d.disclaimer)}</textarea></div>
+    <div class="fg">${lbl('Largura (%)')}<div class="sl-row"><input type="range" id="f-width" min="30" max="100" value="${d.width}"><span class="sl-val" id="lbl-w">${d.width}%</span></div></div>
+    <div class="fg">${lbl('Altura (px)')}<div class="sl-row"><input type="range" id="f-height" min="80" max="600" value="${d.height}"><span class="sl-val" id="lbl-h">${d.height}px</span></div></div>`;
+}
+
+function buildFormTut(d,e){
+  return `<div class="fg">${lbl('Título','tutorial')}<input class="fi" id="f-title" value="${e(d.title)}"></div>
+    <div class="fg">${lbl('Colunas por linha')}<select class="fsel" id="f-columns">${[1,2,3,4].map(n=>`<option value="${n}" ${d.columns===n?'selected':''}>${n} coluna${n>1?'s':''}</option>`).join('')}</select><div class="hint">Passos além das colunas quebram para a próxima linha</div></div>
+    <hr class="sep" style="margin:8px 0">
+    <div id="steps-container">${d.steps.map((s,si)=>`
+      <div style="background:#fafbfd;border:1px solid #dde3ec;border-radius:5px;padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;font-weight:700;color:#2A85CA">Passo ${si+1}</span><button class="btn-danger" onclick="getCur().steps.splice(${si},1);editBloco(editIdx)">Remover</button></div>
+        <div class="fg">${lbl('Título')}<input class="fi" value="${e(s.title)}" onchange="getCur().steps[${si}].title=this.value"></div>
+        <div class="fg">${lbl('Imagem')}<div class="upload-drop" id="stepDrop${si}" style="min-height:70px;padding:10px">${svgI('<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>','#2A85CA',28)}<div style="font-size:8px;color:#5e6e82">Click ou arraste</div><input type="file" class="upload-hidden" id="stepFile${si}" accept="image/*"></div>${s.image?`<img class="preview-thumb" src="${s.image}" style="max-height:90px"><div style="margin-top:4px"><button class="btn btn-sm btn-secondary" onclick="abrirEditorStep(${si})">✏️ Editar</button></div>`:''}</div>
+        <div class="fg">${lbl('Altura imagem (px)')}<div class="sl-row"><input type="range" min="80" max="300" value="${s.imgHeight}" oninput="getCur().steps[${si}].imgHeight=+this.value;this.nextElementSibling.textContent=this.value+'px'"><span class="sl-val">${s.imgHeight}px</span></div></div>
+        <div class="fg">${lbl('Descrição')}<textarea class="fta" style="min-height:60px" onchange="getCur().steps[${si}].desc=this.value">${e(s.desc)}</textarea></div>
+      </div>`).join('')}
+    </div>
+    <button class="btn btn-sm btn-secondary" onclick="getCur().steps.push({title:'Etapa '+(getCur().steps.length+1),image:'',desc:'Descrição.',imgHeight:160});editBloco(editIdx)">+ Adicionar passo</button>`;
+}
+
+/* ── FORM BINDING ── */
+function bindForm(b){
+  const d=b.data;
+  const fw=document.getElementById('f-width'),fh=document.getElementById('f-height');
+  if(fw){fw.oninput=()=>{d.width=+fw.value;document.getElementById('lbl-w').textContent=fw.value+'%'}}
+  if(fh){fh.oninput=()=>{d.height=+fh.value;document.getElementById('lbl-h').textContent=fh.value+'px'}}
+  setupUpload('imgDrop','imgFile',url=>{d.url=url;editBloco(editIdx)});
+  if(b.type==='tutorial') d.steps.forEach((s,si)=>setupUpload('stepDrop'+si,'stepFile'+si,url=>{s.image=url;editBloco(editIdx)}));
+  document.onpaste=ev=>{
+    if(!document.getElementById('modal').classList.contains('show'))return;
+    for(let item of ev.clipboardData.items){
+      if(item.type.startsWith('image/')){loadFile(item.getAsFile(),url=>{if(b.type==='imagem'){d.url=url;editBloco(editIdx)}});break}
+    }
+  };
+}
+
+function setupUpload(dropId,fileId,cb){
+  const drop=document.getElementById(dropId),file=document.getElementById(fileId);
+  if(!drop||!file)return;
+  drop.onclick=()=>file.click();
+  file.onchange=e=>{if(e.target.files&&e.target.files[0])loadFile(e.target.files[0],cb)};
+  drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};
+  drop.ondragleave=()=>drop.classList.remove('over');
+  drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadFile(f,cb)};
+}
+
+function getCur(){return comunicados.find(c=>c.id===selId).blocks[editIdx].data}
+
+function salvarBloco(){
+  const b=comunicados.find(c=>c.id===selId).blocks[editIdx],d=b.data;
+  const g=id=>{const el=document.getElementById(id);return el?el.value:null};
+  switch(b.type){
+    case 'intro':d.greeting=g('f-greeting');d.text=g('f-text');break;
+    case 'section':d.title=g('f-title');d.content=g('f-content');break;
+    case 'destaque':case 'aviso':case 'info':case 'cta':d.title=g('f-title');d.text=g('f-text');break;
+    case 'assinatura':d.name=g('f-name');d.role=g('f-role');d.msg=g('f-msg');break;
+    case 'lista':d.items=g('f-items').split('\n').filter(l=>l.trim());break;
+    case 'cronograma':d.title=g('f-title');break;
+    case 'fluxograma':d.title=g('f-title');d.nodes=g('f-nodes').split('\n').filter(l=>l.trim());break;
+    case 'imagem':d.caption=g('f-caption');d.disclaimer=g('f-disclaimer');d.width=+(g('f-width')||d.width);d.height=+(g('f-height')||d.height);break;
+    case 'tutorial':d.title=g('f-title');d.columns=+(g('f-columns')||d.columns);break;
+  }
+  fecharModal();renderPreview();
+}
+
+function toggleHl(ri,ci){const d=getCur();if(!d.highlighted[ri])d.highlighted[ri]={};d.highlighted[ri][ci]=!d.highlighted[ri][ci];editBloco(editIdx)}
+
+/* ── IMAGE EDITOR ── */
+let ieTool='rect',ieHistory=[],ieIsDrawing=false,ieStartX=0,ieStartY=0,ieSnap=null;
+
+function loadFile(file,cb){if(!file||!file.type.startsWith('image/'))return;const r=new FileReader();r.onload=e=>cb(e.target.result);r.readAsDataURL(file)}
+
+function canvasCoords(canvas,ev){
+  const r=canvas.getBoundingClientRect();
+  const scaleX=canvas.width/r.width;
+  const scaleY=canvas.height/r.height;
+  return { x:(ev.clientX-r.left)*scaleX, y:(ev.clientY-r.top)*scaleY };
+}
+
+function abrirEditor(){
+  const d=getCur();if(!d.url){alert('Carregue uma imagem primeiro');return}
+  editorCallback=url=>{d.url=url;editBloco(editIdx)};
+  document.getElementById('modal').classList.remove('show');
+  setTimeout(()=>iniciarEditor(d.url),100);
+}
+
+function abrirEditorComAnotacoes(){
+  const d=getCur();
+  if(!d.url){alert('Carregue uma imagem primeiro');return}
+  if(!d.annotations) d.annotations=[];
+  document.getElementById('modal').classList.remove('show');
+  setTimeout(()=>iniciarEditorAnotacoes(d.url, d.annotations),100);
+}
+
+function iniciarEditorAnotacoes(src, annotations){
+  /* Cria um overlay customizado para edição de anotações */
+  const overlay=document.createElement('div');
+  overlay.className='ie-overlay show';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:flex;flex-direction:column';
+  overlay.id='annotEditorOverlay';
+  
+  const toolbar=document.createElement('div');
+  toolbar.className='ie-toolbar';
+  toolbar.innerHTML=`<span>Editor de Anotações</span><div class="ie-sep"></div><button class="ie-tool-btn" onclick="closeAnnotEditor()">✕ Fechar</button>`;
+  
+  const canvas=document.createElement('canvas');
+  canvas.id='annotEditorCanvas';
+  canvas.style.cssText='cursor:crosshair;box-shadow:0 2px 12px rgba(0,0,0,.3);max-width:calc(100vw - 60px);max-height:calc(100vh - 160px);object-fit:contain';
+  
+  const canvasArea=document.createElement('div');
+  canvasArea.className='ie-canvas-area';
+  canvasArea.appendChild(canvas);
+  
+  const foot=document.createElement('div');
+  foot.className='ie-foot';
+  foot.innerHTML=`<button class="btn btn-secondary" onclick="closeAnnotEditor()">Cancelar</button><button class="btn btn-primary" onclick="confirmarAnnotEditor()">Salvar</button>`;
+  
+  overlay.appendChild(toolbar);
+  overlay.appendChild(canvasArea);
+  overlay.appendChild(foot);
+  document.body.appendChild(overlay);
+  
+  /* Carrega imagem uma única vez */
+  const img=new Image();
+  img.onload=()=>{
+    const ctx=canvas.getContext('2d');
+    canvas.width=img.naturalWidth;
+    canvas.height=img.naturalHeight;
+    ctx.drawImage(img,0,0);
+    
+    /* Renderiza anotações existentes */
+    annotations.forEach(a=>drawAnnotOnCanvas(ctx,canvas,a));
+    
+    annotEditorState.img=img;
+    bindAnnotEditorCanvas(canvas, annotations);
+  };
+  img.src=src;
+}
+
+function bindAnnotEditorCanvas(canvas, annotations){
+  annotEditorState.annotations=annotations;
+  const ctx=canvas.getContext('2d');
+  let drawing=false, sx=0, sy=0;
+  const baseImg=annotEditorState.img;
+  
+  function redraw(ex=null, ey=null){
+    ctx.drawImage(baseImg,0,0);
+    annotations.forEach(a=>drawAnnotOnCanvas(ctx,canvas,a));
+    /* Desenha rect em progresso */
+    if(ex!==null && ey!==null){
+      ctx.strokeStyle='#2A85CA';
+      ctx.lineWidth=2;
+      ctx.setLineDash([5,3]);
+      ctx.strokeRect(sx,sy,ex-sx,ey-sy);
+      ctx.fillStyle='rgba(42,133,202,0.15)';
+      ctx.fillRect(sx,sy,ex-sx,ey-sy);
+      ctx.setLineDash([]);
+    }
+  }
+  
+  canvas.onmousedown=ev=>{
+    const r=canvas.getBoundingClientRect();
+    const scaleX=canvas.width/r.width;
+    const scaleY=canvas.height/r.height;
+    sx=(ev.clientX-r.left)*scaleX;
+    sy=(ev.clientY-r.top)*scaleY;
+    drawing=true;
+  };
+  
+  canvas.onmousemove=ev=>{
+    if(!drawing) return;
+    const r=canvas.getBoundingClientRect();
+    const scaleX=canvas.width/r.width;
+    const scaleY=canvas.height/r.height;
+    const ex=(ev.clientX-r.left)*scaleX;
+    const ey=(ev.clientY-r.top)*scaleY;
+    
+    /* Use requestAnimationFrame para não travar */
+    if(annotEditorState.requestId) cancelAnimationFrame(annotEditorState.requestId);
+    annotEditorState.requestId=requestAnimationFrame(()=>redraw(ex,ey));
+  };
+  
+  canvas.onmouseup=ev=>{
+    if(!drawing) return;
+    drawing=false;
+    const r=canvas.getBoundingClientRect();
+    const scaleX=canvas.width/r.width;
+    const scaleY=canvas.height/r.height;
+    const ex=(ev.clientX-r.left)*scaleX;
+    const ey=(ev.clientY-r.top)*scaleY;
+    const w=Math.abs(ex-sx), h=Math.abs(ey-sy);
+    
+    redraw(); /* Limpa preview */
+    
+    if(w<8 || h<8) return;
+    
+    const xPct=Math.min(sx,ex)/canvas.width*100;
+    const yPct=Math.min(sy,ey)/canvas.height*100;
+    const wPct=w/canvas.width*100;
+    const hPct=h/canvas.height*100;
+    
+    abrirModalAnnot(-1, {x:xPct, y:yPct, w:wPct, h:hPct}, null, annotations);
+  };
+}
+
+function abrirModalAnnot(bi, rect, editIdx, annotations){
+  annotPending={bi, rect, editIdx, annotations};
+  document.getElementById('modalAnnot').classList.add('show');
+  const titulo=document.getElementById('annot-titulo');
+  if(editIdx!==null){
+    const a=annotations[editIdx];
+    titulo.value=a.title||'';
+    selectedIcon=a.icon||'attention';
+  } else {
+    titulo.value='';
+    selectedIcon='attention';
+  }
+  renderIconGrid();
+  setTimeout(()=>titulo.focus(),80);
+}
+
+function confirmarAnnot(){
+  const {bi, rect, editIdx, annotations}=annotPending;
+  if(rect===null) return;
+  if(!annotations) return;
+  const titulo=document.getElementById('annot-titulo').value.trim();
+  if(editIdx!==null){
+    annotations[editIdx].title=titulo;
+    annotations[editIdx].icon=selectedIcon;
+  } else {
+    annotations.push({...rect, title:titulo, icon:selectedIcon, id:Date.now()});
+  }
+  fecharModalAnnot();
+  
+  /* Se veio do editor de anotações (bi===-1), redesenha canvas */
+  if(bi===-1){
+    const canvas=document.getElementById('annotEditorCanvas');
+    if(canvas){
+      const ctx=canvas.getContext('2d');
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(annotEditorState.img,0,0);
+      annotations.forEach(a=>drawAnnotOnCanvas(ctx,canvas,a));
+    }
+  }
+}
+
+function closeAnnotEditor(){
+  const overlay=document.getElementById('annotEditorOverlay');
+  if(overlay) overlay.remove();
+  editBloco(editIdx);
+}
+
+function confirmarAnnotEditor(){
+  const overlay=document.getElementById('annotEditorOverlay');
+  if(overlay) overlay.remove();
+  
+  /* Salva as anotações em d.annotations */
+  const d=getCur();
+  if(!d.annotations) d.annotations=[];
+  d.annotations=annotEditorState.annotations||[];
+  
+  editBloco(editIdx);
+}
+
+function abrirEditorStep(si){
+  const s=getCur().steps[si];if(!s.image){alert('Carregue uma imagem primeiro');return}
+  editorCallback=url=>{s.image=url;editBloco(editIdx)};
+  document.getElementById('modal').classList.remove('show');
+  setTimeout(()=>iniciarEditor(s.image),100);
+}
+
+function iniciarEditor(src){
+  document.getElementById('imgEditor').classList.add('show');
+  const canvas=document.getElementById('ieCanvas');
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  const img=new Image();
+  img.onload=()=>{
+    canvas.width=img.naturalWidth;
+    canvas.height=img.naturalHeight;
+    ctx.fillStyle='#fff';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0);
+    ieHistory=[ctx.getImageData(0,0,canvas.width,canvas.height)];
+    bindCanvas();
+  };
+  img.src=src;
+}
+
+function setTool(t){
+  ieTool=t;
+  ['crop','rect','arrow'].forEach(id=>{
+    const el=document.getElementById('ie-'+id);
+    if(el)el.classList.toggle('active',id===t);
+  });
+}
+
+function bindCanvas(){
+  const canvas=document.getElementById('ieCanvas');
+  const clone=canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(clone,canvas);
+  const c=document.getElementById('ieCanvas');
+  const ctx=c.getContext('2d',{willReadFrequently:true});
+  if(ieHistory.length) ctx.putImageData(ieHistory[ieHistory.length-1],0,0);
+
+  c.onmousedown=ev=>{
+    const pos=canvasCoords(c,ev);
+    ieStartX=pos.x; ieStartY=pos.y;
+    ieIsDrawing=true;
+    ieSnap=ctx.getImageData(0,0,c.width,c.height);
+  };
+
+  c.onmousemove=ev=>{
+    if(!ieIsDrawing)return;
+    const pos=canvasCoords(c,ev);
+    const color=document.getElementById('ieColor').value;
+    const thickness=+document.getElementById('ieSize').value;
+    const lineW=Math.max(Math.round(c.width*0.002*thickness),1);
+    ctx.putImageData(ieSnap,0,0);
+    ctx.strokeStyle=color; ctx.lineWidth=lineW; ctx.fillStyle=color;
+
+    if(ieTool==='rect'){
+      ctx.beginPath();
+      ctx.strokeRect(ieStartX,ieStartY,pos.x-ieStartX,pos.y-ieStartY);
+    } else if(ieTool==='arrow'){
+      drawArrow(ctx,ieStartX,ieStartY,pos.x,pos.y,lineW);
+    } else if(ieTool==='crop'){
+      ctx.setLineDash([Math.max(c.width*0.005,4),Math.max(c.width*0.003,3)]);
+      ctx.strokeStyle='#2A85CA';
+      ctx.lineWidth=Math.max(c.width*0.002,2);
+      ctx.strokeRect(ieStartX,ieStartY,pos.x-ieStartX,pos.y-ieStartY);
+      ctx.setLineDash([]);
+      ctx.fillStyle='rgba(0,0,0,0.3)';
+      const rx=Math.min(ieStartX,pos.x),ry=Math.min(ieStartY,pos.y);
+      const rw=Math.abs(pos.x-ieStartX),rh=Math.abs(pos.y-ieStartY);
+      ctx.fillRect(0,0,c.width,ry);
+      ctx.fillRect(0,ry,rx,rh);
+      ctx.fillRect(rx+rw,ry,c.width-rx-rw,rh);
+      ctx.fillRect(0,ry+rh,c.width,c.height-ry-rh);
+    }
+  };
+
+  c.onmouseup=ev=>{
+    if(!ieIsDrawing)return;
+    ieIsDrawing=false;
+    const pos=canvasCoords(c,ev);
+    if(ieTool==='crop'){
+      const rx=Math.round(Math.min(ieStartX,pos.x));
+      const ry=Math.round(Math.min(ieStartY,pos.y));
+      const rw=Math.round(Math.abs(pos.x-ieStartX));
+      const rh=Math.round(Math.abs(pos.y-ieStartY));
+      if(rw>5&&rh>5){
+        ctx.putImageData(ieSnap,0,0);
+        const cropped=ctx.getImageData(rx,ry,rw,rh);
+        c.width=rw; c.height=rh;
+        ctx.putImageData(cropped,0,0);
+      }
+    }
+    ieHistory.push(ctx.getImageData(0,0,c.width,c.height));
+  };
+}
+
+function drawArrow(ctx,x1,y1,x2,y2,lineW){
+  const headLen=Math.max(lineW*5,Math.min(ctx.canvas.width*0.02,30));
+  const angle=Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
+  ctx.lineTo(x2-headLen*Math.cos(angle-Math.PI/7),y2-headLen*Math.sin(angle-Math.PI/7));
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-headLen*Math.cos(angle+Math.PI/7),y2-headLen*Math.sin(angle+Math.PI/7));
+  ctx.stroke();
+}
+
+function ieUndo(){
+  if(ieHistory.length<=1)return;
+  ieHistory.pop();
+  const c=document.getElementById('ieCanvas');
+  const last=ieHistory[ieHistory.length-1];
+  c.width=last.width; c.height=last.height;
+  c.getContext('2d',{willReadFrequently:true}).putImageData(last,0,0);
+}
+
+function confirmarEditor(){
+  const url=document.getElementById('ieCanvas').toDataURL('image/png');
+  if(editorCallback)editorCallback(url);
+  fecharEditor();
+}
+function fecharEditor(){
+  document.getElementById('imgEditor').classList.remove('show');
+  if(editIdx!==null)editBloco(editIdx);
+}
+
+function imprimirComunicado(){
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Comunicado</title><style>${document.querySelector('style').textContent}</style></head><body style="margin:20px;display:flex;justify-content:center;background:#f3f5f9">${document.querySelector('.a4').outerHTML}</body></html>`);
+  w.document.close();setTimeout(()=>w.print(),300);
+}
+
+function exportarHTML(){
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Comunicado</title><style>${document.querySelector('style').textContent}</style></head><body style="margin:0;display:flex;justify-content:center;background:#fff">${document.querySelector('.a4').outerHTML}</body></html>`;
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`comunicado-${new Date().toISOString().split('T')[0]}.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportarImagemJPG(){
+  const a4=document.querySelector('.a4');
+  
+  /* Adicionar script html2canvas se não existir */
+  if(typeof html2canvas==='undefined'){
+    const script=document.createElement('script');
+    script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    script.onload=()=>gerarImagemJPG(a4);
+    document.head.appendChild(script);
+  } else {
+    gerarImagemJPG(a4);
+  }
+}
+
+function gerarImagemJPG(a4){
+  /* Show loading message */
+  const btn=event.target;
+  const textOrig=btn.textContent;
+  btn.textContent='Gerando imagem...';
+  btn.disabled=true;
+  
+  html2canvas(a4, {
+    backgroundColor:'#ffffff',
+    scale:2,
+    useCORS:true,
+    logging:false,
+    allowTaint:true
+  }).then(canvas=>{
+    /* Converter para JPG e baixar */
+    const link=document.createElement('a');
+    link.href=canvas.toDataURL('image/jpeg',0.95);
+    link.download=`comunicado-${new Date().toISOString().split('T')[0]}.jpg`;
+    link.click();
+    
+    btn.textContent=textOrig;
+    btn.disabled=false;
+  }).catch(err=>{
+    alert('Erro ao gerar imagem: '+err.message);
+    btn.textContent=textOrig;
+    btn.disabled=false;
+  });
+}
+
+setTool('rect');render();
+</script>
+</body>
+</html>
